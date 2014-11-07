@@ -1,0 +1,68 @@
+<ion-view title="My Group">
+  <ion-content class="padding">
+    <div class="list card">
+
+
+	  <div class="item item-image"><br/>
+	  	<p>Choose your demographic details.</p>
+	    <img style="height:75px;width:75px" src="../img/group.png">
+	  </div>
+
+	</div>
+	 <form ng-submit="AddItem(data)">
+	    <div class="list">
+
+		  <label class="item item-input item-select">
+		    <div class="input-label">
+		      Your age group
+		    </div>
+		    <select>
+		      <option>Less than 18 years</option>
+		      <option selected>19-25 years</option>
+		      <option>26-35 years</option>
+		      <option>36-45 years</option>
+		      <option>46-55 years</option>
+		      <option>56-65 years</option>
+		      <option>Greater than 65 years</option>
+		    </select>
+		  </label>
+		  <br/>
+		   <label class="item item-radio">
+		    <input type="radio" name="group">
+		    <div class="item-content">
+		      Male
+		    </div>
+		    <i class="radio-icon ion-checkmark"></i>
+		  </label>
+		   <label class="item item-radio">
+		    <input type="radio" name="group">
+		    <div class="item-content">
+		      Female
+		    </div>
+		    <i class="radio-icon ion-checkmark"></i>
+		  </label>
+		  <br/>
+			 <label class="item item-input">
+			 	<div class="input-label">
+			      Zipcode
+			    </div>
+		    <input type="number" placeholder="Zipcode">
+		 </label>
+		 <br/>
+			<ul class="list">
+
+  <li class="item item-toggle">
+     Share your location ?
+     <label class="toggle toggle-balanced">
+       <input type="checkbox">
+       <div class="track">
+         <div class="handle"></div>
+       </div>
+     </label>
+  </li>
+
+</ul>
+		</div>
+	  </form>
+  </ion-content>
+</ion-view>

@@ -38,47 +38,48 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
     // Each tab has its own nav history stack:
 
-    .state('tab.dash', {
-      url: '/dash',
+   
+    .state('tab.group', {
+      url: '/group',
       views: {
-        'tab-dash': {
-          templateUrl: 'templates/tab-dash.html',
-          controller: 'DashCtrl'
+        'tab-group': {
+          templateUrl: 'templates/tab-group.html',
+          controller: 'GroupCtrl'
+        }
+      }
+    })
+     .state('tab.spend', {
+      url: '/spend',
+      views: {
+        'tab-spend': {
+          templateUrl: 'templates/tab-spend.html',
+          controller: 'SpendCtrl'
         }
       }
     })
 
-    .state('tab.friends', {
-      url: '/friends',
+    .state('tab.choose', {
+      url: '/choose',
       views: {
-        'tab-friends': {
-          templateUrl: 'templates/tab-friends.html',
-          controller: 'FriendsCtrl'
-        }
-      }
-    })
-    .state('tab.friend-detail', {
-      url: '/friend/:friendId',
-      views: {
-        'tab-friends': {
-          templateUrl: 'templates/friend-detail.html',
-          controller: 'FriendDetailCtrl'
+        'tab-choose': {
+          templateUrl: 'templates/tab-choose.html',
+          controller: 'ChooseCtrl'
         }
       }
     })
 
-    .state('tab.account', {
-      url: '/account',
+    .state('tab.shorts', {
+      url: '/shorts',
       views: {
-        'tab-account': {
-          templateUrl: 'templates/tab-account.html',
-          controller: 'AccountCtrl'
+        'tab-shorts': {
+          templateUrl: 'templates/tab-shorts.html',
+          controller: 'ShortsCtrl'
         }
       }
     });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/dash');
+  $urlRouterProvider.otherwise('/tab/group');
 
 });
 
