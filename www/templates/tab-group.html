@@ -1,4 +1,5 @@
 <ion-view title="My Group">
+<form name="userPref" novalidate>
   <ion-content class="padding">
     <div class="list card" style="margin-top: 0 !important;margin-bottom: 0 !important;">
 
@@ -13,7 +14,7 @@
 	</div>
 	<br/>
 
-	 <form>
+	 
 	    <div class="list">
 
 		  <label class="item item-input item-select">
@@ -46,6 +47,9 @@
 		    <i class="radio-icon ion-checkmark"></i>
 		  </label>
 		  <br/>
+		  <button class="button button-full button-positive" ng-click="addLocation()">Add Location2</button>
+		   <div class="error-container" 
+            ng-show="userPref.zipcode.$invalid && userPref.submitted">Please enter a valid zipcode !</div>
 <ul class="list">
 <li>
 			 <label class="item item-input">
@@ -54,7 +58,7 @@
 			      Zipcode
 			    	</div>
 			    </div>
-  				<div class="col" style="padding:0 !important"><input ng-model="person.zipCode" type="text" maxlength="5" size="5" placeholder="Zipcode"></div>
+  				<div class="col" style="padding:0 !important"><input name="zipcode" ng-pattern="/^[0-9]{1,7}$/" required ng-model="person.zipCode" type="text" maxlength="5" size="5" placeholder="Zipcode"></div>
 				</div>
 		 </label>
 </li>
@@ -70,10 +74,11 @@
 			  </li>
 		 </ul>
 		
-			<button class="button button-full button-positive" ng-click="AddItem(event)" >
+			<button id="saveDetails" disabled="disabled" class="button button-full button-positive" ng-click="AddItem(event)" >
   Save the details and continue
 </button>
 		</div>
-	  </form>
+	  
   </ion-content>
+  </form>
 </ion-view>
