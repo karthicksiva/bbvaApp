@@ -33,7 +33,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     .state('tab', {
       url: "/tab",
       abstract: true,
-      templateUrl: "templates/tabs.html"
+      templateUrl: "templates/tabs.html",
+      controller: 'AppCtrl'
     })
 
     // Each tab has its own nav history stack:
@@ -42,7 +43,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     .state('tab.group', {
       url: '/group',
       views: {
-        'tab-group': {
+        'menuContent': {
           templateUrl: 'templates/tab-group.html',
           controller: 'GroupCtrl'
         }
@@ -51,7 +52,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
      .state('tab.spend', {
       url: '/spend',
       views: {
-        'tab-spend': {
+        'menuContent': {
           templateUrl: 'templates/tab-spend.html',
           controller: 'SpendCtrl'
         }
@@ -61,7 +62,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     .state('tab.choose', {
       url: '/choose',
       views: {
-        'tab-choose': {
+        'menuContent': {
           templateUrl: 'templates/tab-choose.html',
           controller: 'ChooseCtrl'
         }
@@ -71,7 +72,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     .state('tab.shorts', {
       url: '/shorts',
       views: {
-        'tab-shorts': {
+        'menuContent': {
           templateUrl: 'templates/tab-shorts.html',
           controller: 'ShortsCtrl'
         }

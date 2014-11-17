@@ -58,25 +58,53 @@ angular.module('starter.controllers', [])
       }
     }
 })
+.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+  // Form data for the login modal
+  /*$scope.loginData = {};
+
+  // Create the login modal that we will use later
+  $ionicModal.fromTemplateUrl('templates/login.html', {
+    scope: $scope
+  }).then(function(modal) {
+    $scope.modal = modal;
+  });
+
+  // Triggered in the login modal to close it
+  $scope.closeLogin = function() {
+    $scope.modal.hide();
+  };
+
+  // Open the login modal
+  $scope.login = function() {
+    $scope.modal.show();
+  };
+
+  // Perform the login action when the user submits the login form
+  $scope.doLogin = function() {
+    console.log('Doing login', $scope.loginData);
+
+    // Simulate a login delay. Remove this and replace with your login
+    // code if using a login system
+    $timeout(function() {
+      $scope.closeLogin();
+    }, 1000);
+  };*/
+})
 .controller('GroupCtrl', function($scope, $http, $location, $state, BBVADataAPI) {
-		 alert('working');
       $scope.person = {};
        $scope.person.gender = "M";
          $scope.person.shareLocation = "no";
           $scope.person.ageGroup = "2";
            $scope.person.zipCode = "64610";
-if(navigator.geolocation){
-  alert("location available");
-}
            $scope.addLocation = function() {
-    navigator.geolocation.getCurrentPosition(
-        function(position) {
-            alert(position.coords.latitude + ',' + position.coords.longitude);
-        },
-        function() {
-            alert('Error getting location');
-        });
-};
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    alert(position.coords.latitude + ',' + position.coords.longitude);
+                },
+                function() {
+                    alert('Error getting location');
+                });
+            };
     
 BBVADataAPI.getAllZipCodes();
      $scope.AddItem = function() {
@@ -115,23 +143,28 @@ BBVADataAPI.getAllZipCodes();
 })
 
 .controller('SpendCtrl', function($scope, $http, BBVADataAPI) {
-  $scope.loader = "Loading ... Please wait !";
-  var filterValues = {};
-  filterValues.gender = personObj.gender;
-  filterValues.ageValue = personObj.ageGroup;
-    $http.get(BBVADataAPI.getTempUrl(personObj.zipCode), {headers: { 'Authorization': BBVADataAPI.getBbvaAuthKey() }, params : {date_min:20140101,date_max:20140303,group_by:'month',category:'mx_fastfood',level:'category'}} ).
-        success(function (data, status, headers, config) {
-          console.log("success");
-          $scope.loader = "";
-           drawChartforuser(data,filterValues,"barchart","cardscube");
-        }).
-        error(function (data, status, headers, config) {
-           $scope.loader = "There's been an error! Please check your input params and try again";
-            console.error('Error fetching feed:', data);
-        });
+  if(typeof personObj !== 'undefined'){
+      $scope.loader = "Loading ... Please wait !";
+    var filterValues = {};
+    filterValues.gender = personObj.gender;
+    filterValues.ageValue = personObj.ageGroup;
+      $http.get(BBVADataAPI.getTempUrl(personObj.zipCode), {headers: { 'Authorization': BBVADataAPI.getBbvaAuthKey() }, params : {date_min:20140101,date_max:20140303,group_by:'month',category:'mx_fastfood',level:'category'}} ).
+          success(function (data, status, headers, config) {
+            console.log("success");
+            $scope.loader = "";
+             drawChartforuser(data,filterValues,"barchart","cardscube");
+          }).
+          error(function (data, status, headers, config) {
+             $scope.loader = "There's been an error! Please check your input params and try again";
+              console.error('Error fetching feed:', data);
+          });
 
-       
-     $scope.dummy = {};
+         
+       $scope.dummy = {};
+  }
+  else{
+     $scope.loader = "Please save your group preferences first !";
+  }
 
 })
 .controller('ShortsCtrl', function($scope) {

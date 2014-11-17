@@ -2,7 +2,7 @@
   Create tabs with an icon and label, using the tabs-positive style. 
   Each tab's child <ion-nav-view> directive will have its own 
   navigation history that also transitions its views in and out.
--->
+--><!--
 <ion-tabs class="tabs-icon-top">
 
 
@@ -25,4 +25,37 @@
   </ion-tab>
 
 
-</ion-tabs>
+</ion-tabs>-->
+
+<ion-side-menus>
+
+  <ion-side-menu-content>
+    <ion-nav-bar class="bar-stable nav-title-slide-ios7">
+      <ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i> Back</ion-nav-back-button>
+    </ion-nav-bar>
+    <ion-nav-view name="menuContent" animation="slide-left-right"></ion-nav-view>
+  </ion-side-menu-content>
+
+  <ion-side-menu side="left">
+    <header class="bar bar-header bar-stable">
+      <h1 class="title">Menu</h1>
+    </header>
+    <ion-content class="has-header">
+      <ion-list>
+        <ion-item nav-clear menu-close href="#/tab/group">
+          My Group
+        </ion-item>
+        <ion-item nav-clear menu-close href="#/tab/spend">
+          USpend
+        </ion-item>
+        <ion-item nav-clear menu-close href="#/tab/choose">
+          UChoose
+        </ion-item>
+        <ion-item nav-clear menu-close href="#/tab/shorts">
+          My Shortlists
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-side-menu>
+</ion-side-menus>
+
