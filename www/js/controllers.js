@@ -99,10 +99,30 @@ angular.module('starter.controllers', [])
            $scope.addLocation = function() {
             navigator.geolocation.getCurrentPosition(
                 function(position) {
-                    alert(position.coords.latitude + ',' + position.coords.longitude);
+
+                  var lat = position.coords.latitude;
+                  var long = position.coords.longitude;
+                  var  latlng = new google.maps.LatLng(lat, long);
+                  var geocoder = new google.maps.Geocoder();
+                  geocoder.geocode( { 'latLng': latlng}, function(results, status){
+                     if (status == google.maps.GeocoderStatus.OK) {
+                        if (results[0]) {
+                                  for(var i=0; i<results[0].address_components.length; i++) {
+                                      var postalCode = results[0].address_components[i].types;
+                                      if(results[0].address_components[i].types.indexOf("postal_code") !== -1){
+                                         postalCode = results[0].address_components[i].long_name;
+                                         console.log(postalCode);
+                                      }
+                                     
+                                   }
+                               }
+                     } else {
+                        console.log("Geocode was not successful: " + status);
+                     }
+                  });
                 },
                 function() {
-                    alert('Error getting location');
+                    console.log('Error getting location');
                 });
             };
     

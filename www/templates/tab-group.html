@@ -50,6 +50,7 @@
         <i class="radio-icon ion-checkmark"></i>
       </label>
       <br/>
+      <button class="button button-full button-positive" ng-click="addLocation()">Get Location</button>
        <div class="error-container" 
             ng-show="userPref.zipcode.$invalid && userPref.submitted">Please enter a valid zipcode !</div>
 <ul class="list">
@@ -82,4 +83,7 @@
     </div>
   </ion-content>
 </form>
+<ion-footer-bar align-title="left" class="bar-light">
+  <h2 class="title">Copyright &copy; 2014!</h2>
+</ion-footer-bar>
 </ion-view>
