@@ -58,7 +58,31 @@ angular.module('starter.controllers', [])
       }
     }
 })
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, $state) {
+
+  $scope.myTitle = 'Template';
+  
+  $scope.showLoading = function() {
+  
+        $scope.loadingIndicator = $ionicLoading.show({
+            template: 'Please wait ... Work in progress !',
+            animation: 'fade-in',
+            showBackdrop: true,
+            maxWidth: 300,
+            showDelay: 500
+        }); 
+      };
+      $scope.hideLoading = function() {
+  
+         $scope.loadingIndicator.hide();
+      };
+      $scope.showStep3 = function() {
+  
+        $state.go('tab.group2');
+      };
+
+       
+    
   // Form data for the login modal
   /*$scope.loginData = {};
 
@@ -147,7 +171,7 @@ BBVADataAPI.getAllZipCodes();
             if(isZipValid !== -1){
                window.personObj = personObj;
                console.log(personObj);
-               $state.go('tab.spend');
+               $state.go('tab.group2');
             }
             else{
                $scope.userPref.submitted = true;

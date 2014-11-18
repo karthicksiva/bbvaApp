@@ -40,11 +40,47 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     // Each tab has its own nav history stack:
 
    
-    .state('tab.group', {
-      url: '/group',
+    .state('tab.group1', {
+      url: '/group/step1',
       views: {
         'menuContent': {
-          templateUrl: 'templates/tab-group.html',
+          templateUrl: 'templates/tab-group1.html',
+          controller: 'GroupCtrl'
+        }
+      }
+    })
+    .state('tab.group2', {
+      url: '/group/step2',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/tab-group2.html',
+          controller: 'GroupCtrl'
+        }
+      }
+    })
+    .state('tab.group3', {
+      url: '/group/step3',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/tab-group3.html',
+          controller: 'GroupCtrl'
+        }
+      }
+    })
+    .state('tab.group4', {
+      url: '/group/step4',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/tab-group4.html',
+          controller: 'GroupCtrl'
+        }
+      }
+    })
+    .state('tab.group5', {
+      url: '/group/step5',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/tab-group5.html',
           controller: 'GroupCtrl'
         }
       }
@@ -80,7 +116,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/group');
+  $urlRouterProvider.otherwise('/tab/group/step1');
 
 });
 
