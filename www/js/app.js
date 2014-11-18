@@ -45,7 +45,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       views: {
         'menuContent': {
           templateUrl: 'templates/tab-group1.html',
-          controller: 'GroupCtrl'
+          controller: 'Group1Ctrl'
         }
       }
     })
@@ -54,7 +54,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       views: {
         'menuContent': {
           templateUrl: 'templates/tab-group2.html',
-          controller: 'GroupCtrl'
+          controller: 'Group2Ctrl'
         }
       }
     })
@@ -63,7 +63,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       views: {
         'menuContent': {
           templateUrl: 'templates/tab-group3.html',
-          controller: 'GroupCtrl'
+          controller: 'Group3Ctrl'
         }
       }
     })
@@ -72,7 +72,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       views: {
         'menuContent': {
           templateUrl: 'templates/tab-group4.html',
-          controller: 'GroupCtrl'
+          controller: 'Group4Ctrl'
         }
       }
     })
@@ -81,10 +81,19 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       views: {
         'menuContent': {
           templateUrl: 'templates/tab-group5.html',
-          controller: 'GroupCtrl'
+          controller: 'Group5Ctrl'
         }
       }
     })
+      .state('tab.group6', {
+          url: '/group/step6',
+          views: {
+              'menuContent': {
+                  templateUrl: 'templates/tab-group6.html',
+                  controller: 'Group6Ctrl'
+              }
+          }
+      })
      .state('tab.spend', {
       url: '/spend',
       views: {
@@ -116,7 +125,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/group/step1');
+  $urlRouterProvider.otherwise('tab/group/step1');
 
 });
 

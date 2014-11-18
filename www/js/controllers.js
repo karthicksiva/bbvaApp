@@ -27,15 +27,43 @@ angular.module('starter.controllers', [])
        $http.get(this.getZipCodesURL(), {headers: { 'Authorization': this.getBbvaAuthKey() }} ).
         success(function (data, status, headers, config) {
           zipCodesArray = data.data.zip_codes;
-            document.getElementById("saveDetails").disabled = false;
+               if($("#saveDetails").length > 1){
+                   $("#saveDetails")[0].disabled = false;
+               }
             console.log("Zipcodes loaded");
         }).
         error(function (data, status, headers, config) {
-            console.error('Error fetching feed:', data);
+               if($("#saveDetails").length > 1){
+                   $("#errorConsole")[0].style.display = "block";
+                   $("#errorConsole")[0].innerHTML = "Error in reading the BBVA API feed. Try again later!";
+                   $("#saveDetails")[0].disabled = true;
+               }
+
         });
     }
      
   };
+})
+.factory("uSpendSettings", function() {
+        console.log("factory init");
+    var uSpendSettings = {};
+        uSpendSettings.zipCode = "";
+        uSpendSettings.shareLocationPref = "no";
+        uSpendSettings.age = 25;
+        uSpendSettings.ageGroup = "2";
+        uSpendSettings.gender = "M";
+        uSpendSettings.catg = "3";
+        uSpendSettings.subCatg = "4";
+        uSpendSettings.spendingTrend = "D";
+
+    return {
+        getUSpendSettings: function() {
+            return uSpendSettings;
+        },
+        setUSpendSettings: function(settingsObj) {
+            uSpendSettings = settingsObj;
+        }
+    };
 })
 .directive('onlyDigits', function () {
     return {
@@ -60,8 +88,6 @@ angular.module('starter.controllers', [])
 })
 .controller('AppCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, $state) {
 
-  $scope.myTitle = 'Template';
-  
   $scope.showLoading = function() {
   
         $scope.loadingIndicator = $ionicLoading.show({
@@ -150,7 +176,7 @@ angular.module('starter.controllers', [])
                 });
             };
     
-BBVADataAPI.getAllZipCodes();
+    BBVADataAPI.getAllZipCodes();
      $scope.AddItem = function() {
        $scope.userPref.submitted = false;
        $scope.userPref.notAvailable = false;
@@ -185,6 +211,182 @@ BBVADataAPI.getAllZipCodes();
       
      }
 })
+
+.controller('Group1Ctrl', function($scope, $http, $location, $state, BBVADataAPI, uSpendSettings) {
+
+    var settingsObj = uSpendSettings.getUSpendSettings();
+    $scope.person = {};
+    $scope.person.zipCode = settingsObj.zipCode;
+    $scope.person.shareLocationPref = settingsObj.shareLocationPref;
+    //BBVADataAPI.getAllZipCodes();
+    $("#saveDetails")[0].disabled = false;
+    $scope.shareLocation = function() {
+        if($scope.person.shareLocationPref === 'yes') {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    var lat = position.coords.latitude;
+                    var long = position.coords.longitude;
+                    var latlng = new google.maps.LatLng(lat, long);
+                    var geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({ 'latLng': latlng}, function (results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                            if (results[0]) {
+                                for (var i = 0; i < results[0].address_components.length; i++) {
+                                    var postalCode = results[0].address_components[i].types;
+                                    if (results[0].address_components[i].types.indexOf("postal_code") !== -1) {
+                                        postalCode = results[0].address_components[i].long_name;
+                                        console.log(postalCode);
+                                        $scope.person.zipCode = postalCode;
+                                        $("#zipCode").val(postalCode);
+                                        $("#zipCode")[0].disabled = true;
+                                    }
+
+                                }
+                            }
+                        } else {
+                            $scope.person.shareLocationPref = "no";
+                            $("#zipCode")[0].disabled = true;
+                            $("#locationWarn")[0].style.display = "block";
+                        }
+                    });
+                },
+                function () {
+                    console.log('Error getting location');
+                    $scope.person.shareLocationPref = "no";
+                    $("#zipCode")[0].disabled = true;
+                    $("#locationWarn")[0].style.display = "block";
+                });
+        }
+        else{
+            $("#zipCode")[0].disabled = false;
+        }
+    };
+
+
+    $scope.AddItem = function() {
+
+
+        console.log("--> Submitting form");
+        var zipCodesArray = BBVADataAPI.getZipCodesArray();
+        zipCodesArray = ["600097"];
+        if(zipCodesArray.length > 0){
+            var isZipValid = zipCodesArray.indexOf($scope.person.zipCode);
+            console.log(isZipValid);
+            if(isZipValid !== -1){
+                var settingsObj = uSpendSettings.getUSpendSettings();
+                settingsObj.zipCode = $scope.person.zipCode;
+                if($scope.person.shareLocationPref === 'yes') {
+                    settingsObj.shareLocationPref = 'yes';
+                }
+                else{
+                    settingsObj.shareLocationPref = 'no';
+                }
+
+
+                uSpendSettings.setUSpendSettings(settingsObj);
+                console.log(uSpendSettings.getUSpendSettings());
+                $state.go('tab.group2');
+            }
+            else{
+                console.log('Invalid Zip code');
+                $("#errorConsole")[0].style.display = "block";
+                $("#errorConsole")[0].innerHTML = "Invalid Zip code!";
+            }
+        }
+
+
+    }
+})
+
+.controller('Group2Ctrl', function($scope, $http, $location, $state, BBVADataAPI, uSpendSettings) {
+
+    var settingsObj = uSpendSettings.getUSpendSettings();
+    $scope.person = {};
+    $scope.person.ageGroup = settingsObj.ageGroup;
+    $scope.person.gender = settingsObj.gender;
+
+
+    $scope.AddItem = function() {
+                var settingsObj = uSpendSettings.getUSpendSettings();
+                settingsObj.ageGroup = $scope.person.ageGroup;
+                settingsObj.gender = $scope.person.gender;
+                uSpendSettings.setUSpendSettings(settingsObj);
+                console.log(uSpendSettings.getUSpendSettings());
+                $state.go('tab.group3');
+
+    }
+})
+
+
+    .controller('Group3Ctrl', function($scope, $http, $location, $state, BBVADataAPI, uSpendSettings) {
+
+        var settingsObj = uSpendSettings.getUSpendSettings();
+        $scope.person = {};
+        $scope.person.catg = settingsObj.catg;
+
+
+        $scope.AddItem = function() {
+            var settingsObj = uSpendSettings.getUSpendSettings();
+            settingsObj.catg = $scope.person.catg;
+            uSpendSettings.setUSpendSettings(settingsObj);
+            console.log(uSpendSettings.getUSpendSettings());
+            $state.go('tab.group4');
+
+        }
+    })
+
+
+    .controller('Group4Ctrl', function($scope, $http, $location, $state, BBVADataAPI, uSpendSettings) {
+        var settingsObj = uSpendSettings.getUSpendSettings();
+        $scope.person = {};
+        $scope.person.subcatg = settingsObj.subCatg;
+
+
+        $scope.AddItem = function() {
+            var settingsObj = uSpendSettings.getUSpendSettings();
+            settingsObj.subCatg = $scope.person.subcatg;
+            uSpendSettings.setUSpendSettings(settingsObj);
+            console.log(uSpendSettings.getUSpendSettings());
+            $state.go('tab.group5');
+
+        }
+    })
+
+    .controller('Group5Ctrl', function($scope, $http, $location, $state, BBVADataAPI, uSpendSettings) {
+
+        var settingsObj = uSpendSettings.getUSpendSettings();
+        $scope.person = {};
+        $scope.person.spendingTrend = settingsObj.spendingTrend;
+
+
+        $scope.AddItem = function() {
+            var settingsObj = uSpendSettings.getUSpendSettings();
+            settingsObj.spendingTrend = $scope.person.spendingTrend;
+            uSpendSettings.setUSpendSettings(settingsObj);
+            console.log(uSpendSettings.getUSpendSettings());
+            $state.go('tab.spend');
+
+        }
+    })
+
+    .controller('Group6Ctrl', function($scope, $http, $location, $state, BBVADataAPI, uSpendSettings) {
+
+        var settingsObj = uSpendSettings.getUSpendSettings();
+        $scope.person = {};
+        $scope.person.ageGroup = settingsObj.ageGroup;
+        $scope.person.gender = settingsObj.gender;
+
+
+        $scope.AddItem = function() {
+            var settingsObj = uSpendSettings.getUSpendSettings();
+            settingsObj.ageGroup = $scope.person.ageGroup;
+            settingsObj.gender = $scope.person.gender;
+            uSpendSettings.setUSpendSettings(settingsObj);
+            console.log(uSpendSettings.getUSpendSettings());
+            $state.go('tab.group7');
+
+        }
+    })
 
 .controller('SpendCtrl', function($scope, $http, BBVADataAPI) {
   if(typeof personObj !== 'undefined'){
