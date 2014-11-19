@@ -5,9 +5,10 @@ angular.module('starter.controllers', [])
   var zipCodesURL = "https://apis.bbvabancomer.com/datathon/info/zipcodes";
   //app.bbva.mygroup
   //3f26b7f69ed89c9b13d39b22c8c3f546cbef743a
-  var encodedString = btoa("app.bbva.mygroup:3f26b7f69ed89c9b13d39b22c8c3f546cbef743a");
+  var encodedString = btoa("app.bbva.nt:93403fe2846d47aae8239c907bf6de4dca8c1b21");
   var authKeyValue = "Basic " + encodedString;
   var zipCodesArray = [];
+  var merchantCatg =[];
 
   return {
     getBbvaAuthKey: function() {
@@ -23,6 +24,10 @@ angular.module('starter.controllers', [])
     getZipCodesArray: function() {
       return zipCodesArray;
     },
+      getCategoryURL: function() {
+          var tempUrl = "https://apis.bbvabancomer.com/datathon/info/merchants_categories";
+          return tempUrl;
+      },
     getAllZipCodes: function() {
        $http.get(this.getZipCodesURL(), {headers: { 'Authorization': this.getBbvaAuthKey() }} ).
         success(function (data, status, headers, config) {
@@ -44,7 +49,7 @@ angular.module('starter.controllers', [])
      
   };
 })
-.factory("uSpendSettings", function() {
+.factory("uSpendSettings", function($http, BBVADataAPI) {
         console.log("factory init");
     var uSpendSettings = {};
         uSpendSettings.zipCode = "";
@@ -55,8 +60,23 @@ angular.module('starter.controllers', [])
         uSpendSettings.catg = "3";
         uSpendSettings.subCatg = "4";
         uSpendSettings.spendingTrend = "D";
+        uSpendSettings.feed = {};
+        uSpendSettings.merchantCatg = [];
+        uSpendSettings.merchantsubcatg = [];
 
-    return {
+        $http.get(BBVADataAPI.getCategoryURL(), {headers: { 'Authorization': BBVADataAPI.getBbvaAuthKey() }} ).
+            success(function (data, status, headers, config) {
+                uSpendSettings.merchantCatg = data.data.categories;
+
+                console.log("fetched categories feed successfully");
+            }).
+            error(function (data, status, headers, config) {
+                $scope.loader = "There's been an error in fetching categories";
+                console.error('Error fetching feed:', data);
+            });
+
+
+        return {
         getUSpendSettings: function() {
             return uSpendSettings;
         },
@@ -218,7 +238,7 @@ angular.module('starter.controllers', [])
     $scope.person = {};
     $scope.person.zipCode = settingsObj.zipCode;
     $scope.person.shareLocationPref = settingsObj.shareLocationPref;
-    //BBVADataAPI.getAllZipCodes();
+    BBVADataAPI.getAllZipCodes();
     $("#saveDetails")[0].disabled = false;
     $scope.shareLocation = function() {
         if($scope.person.shareLocationPref === 'yes') {
@@ -268,7 +288,7 @@ angular.module('starter.controllers', [])
 
         console.log("--> Submitting form");
         var zipCodesArray = BBVADataAPI.getZipCodesArray();
-        zipCodesArray = ["600097"];
+        //zipCodesArray = ["600097"];
         if(zipCodesArray.length > 0){
             var isZipValid = zipCodesArray.indexOf($scope.person.zipCode);
             console.log(isZipValid);
@@ -323,11 +343,17 @@ angular.module('starter.controllers', [])
         var settingsObj = uSpendSettings.getUSpendSettings();
         $scope.person = {};
         $scope.person.catg = settingsObj.catg;
-
+        $scope.merchantCatg = settingsObj.merchantCatg;
 
         $scope.AddItem = function() {
             var settingsObj = uSpendSettings.getUSpendSettings();
-            settingsObj.catg = $scope.person.catg;
+            settingsObj.catg = $scope.person.catg.code;
+
+            for (var i = 0; i < settingsObj.merchantCatg.length; i++){
+                if (settingsObj.merchantCatg[i].code === settingsObj.catg){
+                    settingsObj.merchantsubcatg = settingsObj.merchantCatg[i].subcategories;
+                }
+            }
             uSpendSettings.setUSpendSettings(settingsObj);
             console.log(uSpendSettings.getUSpendSettings());
             $state.go('tab.group4');
@@ -340,11 +366,14 @@ angular.module('starter.controllers', [])
         var settingsObj = uSpendSettings.getUSpendSettings();
         $scope.person = {};
         $scope.person.subcatg = settingsObj.subCatg;
+        $scope.merchantsubcatg = settingsObj.merchantsubcatg;
+
+
 
 
         $scope.AddItem = function() {
             var settingsObj = uSpendSettings.getUSpendSettings();
-            settingsObj.subCatg = $scope.person.subcatg;
+            settingsObj.subCatg = $scope.person.subcatg.code;
             uSpendSettings.setUSpendSettings(settingsObj);
             console.log(uSpendSettings.getUSpendSettings());
             $state.go('tab.group5');
@@ -388,31 +417,40 @@ angular.module('starter.controllers', [])
         }
     })
 
-.controller('SpendCtrl', function($scope, $http, BBVADataAPI) {
-  if(typeof personObj !== 'undefined'){
-      $scope.loader = "Loading ... Please wait !";
-    var filterValues = {};
-    filterValues.gender = personObj.gender;
-    filterValues.ageValue = personObj.ageGroup;
-      $http.get(BBVADataAPI.getTempUrl(personObj.zipCode), {headers: { 'Authorization': BBVADataAPI.getBbvaAuthKey() }, params : {date_min:20140101,date_max:20140303,group_by:'month',category:'mx_fastfood',level:'category'}} ).
-          success(function (data, status, headers, config) {
-            console.log("success");
-            $scope.loader = "";
-             drawChartforuser(data,filterValues,"barchart","cardscube");
-          }).
-          error(function (data, status, headers, config) {
-             $scope.loader = "There's been an error! Please check your input params and try again";
-              console.error('Error fetching feed:', data);
-          });
+    .controller('SpendCtrl', function($scope, $http, BBVADataAPI, uSpendSettings) {
+        var settingsObj = uSpendSettings.getUSpendSettings();
+        personObj = settingsObj;
+        if(typeof personObj !== 'undefined'){
+            $scope.loader = "Loading ... Please wait !";
+            var filterValues = {};
+            filterValues.gender = personObj.gender;
+            filterValues.ageValue = personObj.ageGroup;
+            $http.get(BBVADataAPI.getTempUrl(personObj.zipCode), {headers: { 'Authorization': BBVADataAPI.getBbvaAuthKey() }, params : {date_min:20140101,date_max:20140303,group_by:'month',category:'mx_fastfood',level:'category'}} ).
+                success(function (data, status, headers, config) {
+                    console.log("success");
+                    $scope.loader = "";
+                    currentZippcode = "11000";
+                    currentCategory = "mx_fastfood";
+                    currentLevel = "category";
+                    nextGroupBy = "week";
+                    filterValues.gender = "M";
+                    filterValues.ageValue = "2";
+                    drawChartforuser(data,filterValues,"barchart","cardscube");
+                    timeline = "month";
+                }).
+                error(function (data, status, headers, config) {
+                    $scope.loader = "There's been an error! Please check your input params and try again";
+                    console.error('Error fetching feed:', data);
+                });
 
-         
-       $scope.dummy = {};
-  }
-  else{
-     $scope.loader = "Please save your group preferences first !";
-  }
 
-})
+            $scope.dummy = {};
+        }
+        else{
+            $scope.loader = "Please save your group preferences first !";
+        }
+
+    })
 .controller('ShortsCtrl', function($scope) {
 
 })

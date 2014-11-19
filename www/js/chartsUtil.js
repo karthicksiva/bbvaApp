@@ -1,3 +1,22 @@
+// set filter criteria from My Group Selections
+var timeline = "";
+var currentMonthSelection = 0;
+var currentYearSelection = 2014;
+var minDate = 20140101;
+var maxDate = 20140601;
+var filterValues = {};
+var currentZippcode = "11000";
+var currentCategory = "mx_fastfood";
+var currentLevel = "category";
+var nextGroupBy = "month";
+filterValues.gender = "M";
+filterValues.ageValue = "2";
+
+// Authentication Value for BBVA
+encodedString = btoa("app.bbva.bbva_sencha:56f2fa95dc3884be48dde823399cafdb88d37740");
+authKeyValue = "Basic " + encodedString;
+
+
 function createOptionsForChart(chartType,drawContainer){
 	// create options object
 	var options = {
@@ -10,7 +29,7 @@ function createOptionsForChart(chartType,drawContainer){
 			   title: {
 			       text: '',
 			       style: {
-	                    fontSize: '16px',
+	                    fontSize: '12px',
 	                    fontFamily: 'Verdana, sans-serif',
 	                    fontWeight : 'bold'
 	                }
@@ -20,7 +39,7 @@ function createOptionsForChart(chartType,drawContainer){
 			       title: {
 			           text: '',
 			           style: {
-		                    fontSize: '14px',
+		                    fontSize: '10px',
 		                    fontFamily: 'Verdana, sans-serif',
 		                    fontWeight : 'bold'
 		                }
@@ -28,7 +47,7 @@ function createOptionsForChart(chartType,drawContainer){
 			       labels :{
 			    	   rotation  : 0,
 			    	   style: {
-		                    fontSize: '12px',
+		                    fontSize: '8px',
 		                    fontFamily: 'Verdana, sans-serif',
 		                    fontWeight : 'bold'
 		                }
@@ -38,7 +57,7 @@ function createOptionsForChart(chartType,drawContainer){
 			       title: {
 			           text: '',
 			           style: {
-		                    fontSize: '14px',
+		                    fontSize: '10px',
 		                    fontFamily: 'Verdana, sans-serif',
 		                    fontWeight : 'bold'
 		                }
@@ -46,7 +65,7 @@ function createOptionsForChart(chartType,drawContainer){
 			       labels :{
 			    	   rotation  : 0,
 			    	   style: {
-		                    fontSize: '12px',
+		                    fontSize: '8px',
 		                    fontFamily: 'Verdana, sans-serif',
 		                    fontWeight : 'bold'
 		                }
@@ -87,15 +106,22 @@ function createOptionsForChart(chartType,drawContainer){
 			options.xAxis.tickmarkPlacement = "on";
 			options.xAxis.labels.rotation = -45;
 			options.yAxis.title.text = "# of Payments";
+			options.plotOptions.series.point.events.click = function(e){
+				doClickEventOnChart(this,e);
+			};
 			options.tooltip.pointFormat = '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-   										  '<td style="padding:0"><b>{point.y:.1f} Payments</b></td></tr>'
+   										  '<td style="padding:0"><b>{point.y:.1f} Payments</b></td></tr>';
 		}else if(chartType == "cardscube"){
 			options.chart.defaultSeriesType = "column";
 			options.title.text = "Spend Habits";
 			options.xAxis.title.text = "Dates";
 			options.yAxis.title.text = "Avergae Spend";
+			if(timeline == "week"){options.xAxis.labels.rotation = -45};
+			options.plotOptions.series.point.events.click = function(e){
+				doClickEventOnChart(this,e);
+			};
 			options.tooltip.pointFormat = '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-   										  '<td style="padding:0"><b>$ {point.y:.1f}</b></td></tr>'
+   										  '<td style="padding:0"><b>$ {point.y:.1f}</b></td></tr>';
 		}
 	options.chart.renderTo = drawContainer;
 
@@ -103,10 +129,113 @@ function createOptionsForChart(chartType,drawContainer){
 	return options;
 }
 
+function doClickEventOnChart(click,event){
+	 if(timeline == "month"){
+		   console.log(timeline);
+		   var currentdate = click.category;
+	   	   var year = parseInt(currentdate.slice(0,4));
+	   	   currentYearSelection = year;
+	   	   var month = parseInt(currentdate.slice(4,6));
+	   	   currentMonthSelection = month-1;
+	   	   var formatedMonthEnd = new Date(year,month,0);
+	   	   var formatedMonthStart = new Date(year,month-1,1);
+           var formatedYear = formatedMonthStart.getFullYear();
+	   	   var formatedMonth = ((formatedMonthStart.getMonth() + 1)<10)?"0"+(formatedMonthStart.getMonth() + 1):(formatedMonthStart.getMonth() + 1);
+	   	   var formatedDay = (formatedMonthStart.getDate() < 10 )? "0"+formatedMonthStart.getDate():formatedMonthStart.getDate();
+           var startDate = parseInt(formatedYear+""+ formatedMonth +""+ formatedDay);
+           var formatedYear = formatedMonthEnd.getFullYear();
+	   	   var formatedMonth = ((formatedMonthEnd.getMonth() + 1)<10)?"0"+(formatedMonthEnd.getMonth() + 1):(formatedMonthEnd.getMonth() + 1);
+	   	   var formatedDay = (formatedMonthEnd.getDate() < 10 )? "0"+formatedMonthEnd.getDate():formatedMonthEnd.getDate();
+	   	   var endDate = parseInt(formatedYear+""+ formatedMonth +""+ formatedDay);
+	       //Ajax call to get data for bar chart using cards cube API
+	       $.ajax({
+	              url: "https://apis.bbvabancomer.com/datathon/zipcodes/"+currentZippcode+"/cards_cube",
+	              headers: { 'Authorization': authKeyValue },
+	              contentType: 'application/json; charset=utf-8',
+	              data : {date_min:startDate,date_max:endDate,group_by:nextGroupBy,category:currentCategory,level:currentLevel}
+	          }).done(function( data ) {
+	       	   if(data.result.code == "200" || result.code == "201"){
+	           	   drawChartforuser(data,filterValues,"barchart","cardscube");
+	               timeline = "week";
+	               nextGroupBy = "day";
+	       	   }else{
+	       		   alert("could not find any related data");
+	       	   }
+	       }).fail(function() {
+			    alert( "Unexpected Error try again later" );
+			});
+	   }else if(timeline == "week"){
+		   console.log(timeline);
+		   var currentdate = click.category;
+	   	   var year = parseInt(currentdate.slice(0,4));
+		   var weekIncrement = 1;
+		   var week = {};
+		   for(i=0;i<click.series.xData.length;i++){
+			   var weeksObj = {};
+			   var MonthStartDate = new Date(currentYearSelection,currentMonthSelection,weekIncrement);
+			   var day = MonthStartDate.getDay();
+			   var firstDay = new Date(MonthStartDate.getTime() - 60*60*24* day*1000);
+			   var lastday = new Date(firstDay.getTime() + 60*60*24* 6*1000);
+			   var formatedYear = firstDay.getFullYear();
+		   	   var formatedMonth = ((firstDay.getMonth() + 1)<10)?"0"+(firstDay.getMonth() + 1):(firstDay.getMonth() + 1);
+		   	   var formatedDay = (firstDay.getDate() < 10 )? "0"+firstDay.getDate():firstDay.getDate();
+	           var startDate = parseInt(formatedYear+""+ formatedMonth +""+ formatedDay);
+	           var formatedYear = lastday.getFullYear();
+		   	   var formatedMonth = ((lastday.getMonth() + 1)<10)?"0"+(lastday.getMonth() + 1):(lastday.getMonth() + 1);
+		   	   var formatedDay = (lastday.getDate() < 10 )? "0"+lastday.getDate():lastday.getDate();
+		   	   var endDate = parseInt(formatedYear+""+ formatedMonth +""+ formatedDay);
+			   weeksObj.start = startDate;
+			   weeksObj.end = endDate;
+			   weekIncrement = weekIncrement + 6;
+			   if(i == click.index){
+				   week = weeksObj;
+				   break;
+			   }
+		   }
+		 //Ajax call to get data for bar chart using cards cube API
+	       $.ajax({
+	              url: "https://apis.bbvabancomer.com/datathon/zipcodes/"+currentZippcode+"/cards_cube",
+	              headers: { 'Authorization': authKeyValue },
+	              contentType: 'application/json; charset=utf-8',
+	              data : {date_min:week.start,date_max:week.end,group_by:nextGroupBy,category:currentCategory,level:'category'}
+	          }).done(function( data ) {
+	       	   if(data.result.code == "200" || result.code == "201"){
+	           	   drawChartforuser(data,filterValues,"barchart","cardscube");
+	               timeline = "day";
+	               nextGroupBy = "month";
+	       	   }else{
+	       		   alert("could not find any related data");
+	       	   }
+	       }).fail(function() {
+			    alert( "Unexpected Error try again later" );
+			});
+	   }else if(timeline == "day"){
+		  console.log(timeline);
+		  var curDate = parseInt(click.category);
+		 //Ajax call to get data for line chart using payments cube API
+		   $.ajax({
+	          url: "https://apis.bbvabancomer.com/datathon/zipcodes/"+currentZippcode+"/payments_cube",
+	          headers: { 'Authorization': authKeyValue },
+	          contentType: 'application/json; charset=utf-8',
+	          data : {date_min:curDate,date_max:curDate,group_by:nextGroupBy,category:currentCategory}
+	      }).done(function( data ) {
+	           drawChartforuser(data,filterValues,"barchart","paymentscube");
+	           timeline = "date";
+	           nextGroupBy = "month";
+	      }).fail(function() {
+			    alert( "Unexpected Error try again later" );
+		  });
+	   }else if(timeline == "date"){
+	   }else{
+		   alert("unexpected input");
+	   }
+}
+
 function doLogicforChart(chartType,dataObj,filterCriteria){
 	// create a  object to return both catagories and data to drawChartforuser function
 	var returnData = {};
 	if(chartType == "paymentscube"){
+		dataObjVerify = dataObj;
 		var graphdata = new Array();
 	    var values = new Array();
 	    var categories = new Array();
@@ -143,7 +272,11 @@ function doLogicforChart(chartType,dataObj,filterCriteria){
 		var totalAmtYou = new Array();
 		var graphData = new Array();
 		dataObj.data.stats.forEach(function(data,count,total){
-			categories.push(data.date);
+			if(timeline == "month"){
+				categories.push("Week " + (count+1));
+			}else{
+				categories.push(data.date);
+			}
 		    var avgYou = 0.0;
 		    var avgAll = 0.0;
 		    var count = 0 ;

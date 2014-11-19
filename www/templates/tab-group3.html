@@ -9,14 +9,7 @@
                     <div class="input-label">
                         Choose a category
                     </div>
-                    <select ng-model="person.catg">
-                        <option value="1">All</option>
-                        <option value="2" selected>Cars</option>
-                        <option value="3">Bars and Restaurants</option>
-                        <option value="4">Beauty</option>
-                        <option value="5">Book Store</option>
-                        <option value="6">Construction Material</option>
-                        <option value="7">Education</option>
+                    <select ng-model="person.catg" ng-options="c.description for c in merchantCatg track by c.code">
                     </select>
                 </label>
                 <br/>

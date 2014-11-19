@@ -9,13 +9,7 @@
                     <div class="input-label">
                         Choose a sub category
                     </div>
-                    <select ng-model="person.subcatg">
-                        <option value="1">All</option>
-                        <option value="2" selected>Home Accessories</option>
-                        <option value="3">Antique Shops</option>
-                        <option value="4">Florists</option>
-                        <option value="5">Photography</option>
-                        <option value="6">Gardening</option>
+                    <select ng-model="person.subcatg"  ng-options="c.description for c in merchantsubcatg track by c.code">
                     </select>
                 </label>
                 <br/>
